@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VTU Autopilot — Skip the Suffering</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300ff87'/%3E%3Cpath d='M8 16l5 5 11-10' stroke='%23000' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E" />
+  <meta name="description" content="Auto-complete your VTU online courses while you reclaim your life." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #050505;
+      --bg2:      #0a0a0a;
+      --card:     #0f0f0f;
+      --border:   #1a1a1a;
+      --border2:  #222;
+      --lime:     #00ff87;
+      --lime-dim: #00cc6a;
+      --lime-glow:#00ff8740;
+      --white:    #f0f0f0;
+      --muted:    #555;
+      --muted2:   #333;
+      --red:      #ff4444;
+      --amber:    #ffaa00;
+      --cyan:     #00d4ff;
+      --font:     'Syne', sans-serif;
+      --mono:     'JetBrains Mono', monospace;
+      --r:        8px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(5,5,5,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 max(1.5rem, env(safe-area-inset-left));
+    }
+
+    .nav-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 56px;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--white);
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: 0.02em;
+    }
+
+    .nav-logo-mark {
+      width: 28px;
+      height: 28px;
+      background: var(--lime);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .nav-logo-mark svg { color: #000; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-gh {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border2);
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      transition: all 0.2s;
+      background: var(--card);
+    }
+    .nav-gh:hover { border-color: var(--lime); color: var(--lime); }
+
+    /* ── LAYOUT ── */
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 5rem 0 4rem;
+      position: relative;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(0,255,135,0.08);
+      border: 1px solid rgba(0,255,135,0.2);
+      color: var(--lime);
+      font-size: 0.7rem;
+      font-family: var(--mono);
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+      border-radius: 100px;
+      margin-bottom: 2rem;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: var(--lime);
+      border-radius: 50%;
+      animation: blink 1.5s ease-in-out infinite;
+    }
+
+    @keyframes blink { 0%,100% { opacity:1; } 50% { opacity:0.2; } }
+
+    h1 {
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--lime);
+    }
+
+    .hero-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 500px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+
+    /* ── STATS ── */
+    .stats-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stat-chip {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 14px 20px;
+      min-width: 160px;
+    }
+
+    .stat-num {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-family: var(--mono);
+      color: var(--lime);
+      line-height: 1;
+    }
+
+    .stat-lbl {
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 0;
+    }
+
+    /* ── SECTION ── */
+    section { padding: 4rem 0; }
+
+    .sec-label {
+      font-size: 0.7rem;
+      font-family: var(--mono);
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--lime);
+      margin-bottom: 1rem;
+    }
+
+    .sec-title {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+    }
+
+    .sec-sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 2.5rem;
+    }
+
+    /* ── STEPS ── */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+    }
+
+    .step {
+      background: var(--card);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .step-num {
+      font-size: 0.65rem;
+      font-family: var(--mono);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+
+    .step-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: rgba(0,255,135,0.08);
+      border: 1px solid rgba(0,255,135,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--lime);
+    }
+
+    .step-icon svg { width: 18px; height: 18px; }
+
+    .step h3 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .step p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* ── FORM CARD ── */
+    .form-wrap {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .form-header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-header-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .dot-red { background: #ff5f57; }
+    .dot-amber { background: #febc2e; }
+    .dot-green { background: #28c840; }
+
+    .form-header-title {
+      font-size: 0.75rem;
+      font-family: var(--mono);
+      color: var(--muted);
+      margin-left: 4px;
+      letter-spacing: 0.03em;
+    }
+
+    .form-body {
+      padding: 2rem;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 540px) { .form-grid { grid-template-columns: 1fr; } }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+
+    .field label {
+      font-size: 0.72rem;
+      font-family: var(--mono);
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .field input {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      color: var(--white);
+      font-family: var(--mono);
+      font-size: 0.88rem;
+      padding: 10px 14px;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+    }
+
+    .field input::placeholder { color: var(--muted2); }
+    .field input:focus { border-color: var(--lime); }
+
+    .field-hint {
+      font-size: 0.7rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .field-hint code {
+      font-family: var(--mono);
+      background: var(--border2);
+      padding: 1px 5px;
+      border-radius: 3px;
+      color: var(--cyan);
+      font-size: 0.7rem;
+    }
+
+    /* ── NOTIFICATION ── */
+    #notification {
+      background: rgba(255,170,0,0.08);
+      border: 1px solid rgba(255,170,0,0.25);
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 1rem;
+      font-size: 0.82rem;
+      color: var(--amber);
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    #notification svg { flex-shrink: 0; margin-top: 2px; }
+
+    /* ── SUBMIT BTN ── */
+    .btn-submit {
+      width: 100%;
+      padding: 13px;
+      background: var(--lime);
+      color: #000;
+      border: none;
+      border-radius: 7px;
+      font-family: var(--font);
+      font-weight: 800;
+      font-size: 0.95rem;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1.5rem;
+    }
+
+    .btn-submit:hover { background: #00e07a; transform: translateY(-1px); }
+    .btn-submit:active { transform: none; }
+    .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; background: var(--lime); }
+
+    /* ── PROGRESS SECTION ── */
+    #progressSection { display: none; }
+
+    .prog-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .prog-header {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .prog-header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.68rem;
+      font-family: var(--mono);
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+
+    .status-badge.queued { background: rgba(255,170,0,0.12); color: var(--amber); border: 1px solid rgba(255,170,0,0.25); }
+    .status-badge.running { background: rgba(0,255,135,0.1); color: var(--lime); border: 1px solid rgba(0,255,135,0.25); }
+    .status-badge.done { background: rgba(0,255,135,0.1); color: var(--lime); border: 1px solid rgba(0,255,135,0.25); }
+    .status-badge.failed { background: rgba(255,68,68,0.1); color: var(--red); border: 1px solid rgba(255,68,68,0.25); }
+
+    .status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status-badge.running .status-dot { animation: blink 1s infinite; }
+
+    .prog-share-btn {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: var(--border2);
+      border: 1px solid var(--border2);
+      border-radius: 5px;
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-family: var(--mono);
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .prog-share-btn:hover { border-color: var(--border2); color: var(--white); }
+
+    .prog-body { padding: 1.5rem; }
+
+    /* ── PROGRESS BAR ── */
+    .prog-numbers {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 8px;
+    }
+
+    .prog-pct {
+      font-size: 2rem;
+      font-weight: 800;
+      font-family: var(--mono);
+      color: var(--lime);
+      line-height: 1;
+    }
+
+    .prog-count {
+      font-size: 0.78rem;
+      font-family: var(--mono);
+      color: var(--muted);
+    }
+
+    .prog-bar-track {
+      height: 4px;
+      background: var(--border2);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .prog-bar-fill {
+      height: 100%;
+      background: var(--lime);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* ── QUEUE ── */
+    .queue-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,170,0,0.06);
+      border: 1px solid rgba(255,170,0,0.15);
+      border-radius: 6px;
+      padding: 12px 16px;
+      margin-bottom: 1rem;
+      font-size: 0.82rem;
+      color: var(--amber);
+    }
+
+    /* ── LOG TERMINAL ── */
+    .log-label {
+      font-size: 0.65rem;
+      font-family: var(--mono);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .log-terminal {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 1rem;
+      height: 220px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      line-height: 1.6;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border2) transparent;
+    }
+
+    .log-terminal::-webkit-scrollbar { width: 4px; }
+    .log-terminal::-webkit-scrollbar-track { background: transparent; }
+    .log-terminal::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+    .log-line { display: flex; gap: 8px; }
+    .log-ts { color: var(--muted); flex-shrink: 0; }
+    .log-line.ok .log-text { color: #7fff7f; }
+    .log-line.err .log-text { color: var(--red); }
+    .log-line.skip .log-text { color: var(--muted); }
+    .log-line.info .log-text { color: #aaa; }
+    .log-line.phase .log-text { color: var(--cyan); font-weight: 600; }
+
+    /* ── SUCCESS / FAIL PANELS ── */
+    .result-panel {
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-top: 1rem;
+    }
+
+    .result-panel.ok { border: 1px solid rgba(0,255,135,0.2); }
+    .result-panel.fail { border: 1px solid rgba(255,68,68,0.2); }
+
+    .result-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.5rem;
+    }
+    .result-panel.ok .result-title { color: var(--lime); }
+    .result-panel.fail .result-title { color: var(--red); }
+
+    .result-sub { font-size: 0.82rem; color: var(--muted); }
+
+    .result-stats {
+      display: flex;
+      gap: 10px;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .result-stat {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 16px;
+      flex: 1;
+      min-width: 80px;
+    }
+
+    .result-stat-num {
+      font-size: 1.4rem;
+      font-weight: 800;
+      font-family: var(--mono);
+      color: var(--lime);
+      line-height: 1;
+    }
+
+    .result-stat-lbl {
+      font-size: 0.7rem;
+      color: var(--muted);
+      letter-spacing: 0.03em;
+    }
+
+    .result-stat.fail-stat .result-stat-num { color: var(--red); }
+
+    /* ── GLOBAL COUNTER (community) ── */
+    .community-counters {
+      display: flex;
+      gap: 12px;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .community-stat {
+      font-family: var(--mono);
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .community-stat span {
+      color: var(--lime);
+      font-weight: 700;
+    }
+
+    /* ── SECONDARY BTN ── */
+    .btn-sec {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      color: var(--muted);
+      font-family: var(--font);
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 9px 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 1rem;
+    }
+    .btn-sec:hover { border-color: var(--white); color: var(--white); }
+
+    /* ── GITHUB BANNER ── */
+    .gh-cta {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .gh-cta-text h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.3rem;
+    }
+
+    .gh-cta-text p { font-size: 0.82rem; color: var(--muted); }
+
+    .gh-cta-text em { color: var(--lime); font-style: normal; }
+
+    .btn-star {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 7px;
+      color: var(--white);
+      font-family: var(--font);
+      font-weight: 700;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+    .btn-star:hover { border-color: var(--lime); color: var(--lime); }
+
+    /* ── INSTALL SECTION ── */
+    .install-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      width: 100%;
+    }
+
+    @media (min-width: 700px) {
+      .install-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        flex-direction: unset;
+      }
+    }
+
+    .install-panel {
+      background: var(--card);
+      padding: 1.75rem;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .install-panel-label {
+      font-size: 0.65rem;
+      font-family: var(--mono);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .install-panel h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .install-panel p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .code-block {
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: #aaa;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .code-block code {
+      color: var(--white);
+      flex: 1;
+      min-width: 0;
+      word-break: break-all;
+      white-space: pre-wrap;
+    }
+
+    .copy-btn {
+      background: var(--border2);
+      border: none;
+      border-radius: 4px;
+      padding: 3px 8px;
+      color: var(--muted);
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+
+    .copy-btn:hover { color: var(--white); }
+    .copy-btn.copied { color: var(--lime); }
+
+    /* ── FAQ ── */
+    .faq-list { display: flex; flex-direction: column; gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+
+    .faq-item { background: var(--card); }
+
+    .faq-q {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      gap: 1rem;
+      transition: color 0.15s;
+    }
+    .faq-q:hover { color: var(--lime); }
+
+    .faq-toggle {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .faq-a {
+      display: none;
+      padding: 0 1.25rem 1rem;
+      font-size: 0.84rem;
+      color: var(--muted);
+      line-height: 1.7;
+      border-top: 1px solid var(--border);
+    }
+
+    .faq-item.open .faq-a { display: block; }
+    .faq-item.open .faq-toggle { transform: rotate(45deg); color: var(--lime); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    footer a { color: var(--muted); text-decoration: none; transition: color 0.15s; }
+    footer a:hover { color: var(--white); }
+
+    .footer-links { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+    .footer-dot { color: var(--border2); }
+
+    /* ── HIDDEN ── */
+    [hidden] { display: none !important; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .hero, .form-wrap, .prog-card {
+      animation: fadeUp 0.5s ease both;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .hero { padding: 3.5rem 0 3rem; }
+      section { padding: 3rem 0; }
+      h1 { font-size: 2.6rem; }
+      .gh-cta { flex-direction: column; }
+      footer { flex-direction: column; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-mark">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      VTU Autopilot
+    </a>
+    <div class="nav-right">
+      <a href="https://github.com/r2k-venom/vtu-course-automation" target="_blank" rel="noopener noreferrer" class="nav-gh github-link">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ── HERO ── -->
+  <section class="hero">
+    <div class="hero-eyebrow">Not affiliated with VTU &nbsp;·&nbsp; Obviously</div>
+    <h1>Skip the<br><em>166 lectures.</em></h1>
+    <p class="hero-sub">
+      VTU decided a hundred and sixty-six lectures per subject was a great idea.
+      We decided otherwise. Enter your credentials, grab a coffee, done.
+    </p>
+    <div class="stats-row">
+      <div class="stat-chip">
+        <div class="stat-num" id="studentsCounter">0</div>
+        <div class="stat-lbl">Students freed</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-num" id="lecturesCounter">0</div>
+        <div class="stat-lbl">Lectures auto-completed</div>
+      </div>
+      <div class="stat-chip">
+        <div class="stat-num" id="hoursCounter">0</div>
+        <div class="stat-lbl">Hours saved (~30 min/lecture)</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ── HOW IT WORKS ── -->
+  <section>
+    <div class="sec-label">How it works</div>
+    <div class="sec-title">Four steps to freedom</div>
+    <p class="sec-sub">VTU made a portal. We made a bypass.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>
+          </svg>
+        </div>
+        <h3>Enter credentials</h3>
+        <p>Your VTU online portal login — same ones used at online.vtu.ac.in.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/>
+          </svg>
+        </div>
+        <h3>Pick your course</h3>
+        <p>Paste the slug from the URL. Autopilot discovers every lecture automatically.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <h3>Wait a minute</h3>
+        <p>The server completes each lecture via the official API. No browser needed.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+        <h3>All done</h3>
+        <p>Full progress. Zero regret. Go live your life.</p>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ── FORM ── -->
+  <section id="formSection">
+    <div class="sec-label">Get started</div>
+    <div class="sec-title">Run autopilot</div>
+    <p class="sec-sub">Your credentials are never stored — they're used once and discarded.</p>
+
+    <div class="form-wrap">
+      <div class="form-header">
+        <div class="form-header-dot dot-red"></div>
+        <div class="form-header-dot dot-amber"></div>
+        <div class="form-header-dot dot-green"></div>
+        <div class="form-header-title">vtu-autopilot — new session</div>
+      </div>
+      <div class="form-body">
+        <div id="notification" hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="notifMsg"></span>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label for="emailInput">VTU Email</label>
+            <input type="email" id="emailInput" placeholder="yourid@vtu.ac.in" autocomplete="email" />
+          </div>
+          <div class="field">
+            <label for="pwInput">Password</label>
+            <input type="password" id="pwInput" placeholder="••••••••" autocomplete="current-password" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="slugInput">Course Slug</label>
+          <input type="text" id="slugInput" placeholder="1-social-networks" />
+          <p class="field-hint">
+            The slug is the last part of the course URL on online.vtu.ac.in — e.g.
+            <code>/course/1-social-networks</code> → slug is <code>1-social-networks</code>
+          </p>
+        </div>
+
+        <button class="btn-submit" id="submitBtn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Launch Autopilot
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PROGRESS ── -->
+  <section id="progressSection">
+    <div class="sec-label">Live progress</div>
+    <div class="sec-title">Running…</div>
+    <p class="sec-sub" id="progSubtitle">Connecting to VTU portal.</p>
+
+    <div class="prog-card">
+      <div class="prog-header">
+        <div class="prog-header-left">
+          <span class="status-badge queued" id="statusBadge">
+            <span class="status-dot"></span>
+            <span id="statusText">Queued</span>
+          </span>
+        </div>
+        <button class="prog-share-btn" id="shareBtn">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Share link
+        </button>
+      </div>
+      <div class="prog-body">
+
+        <!-- Queue waiting -->
+        <div id="queuePanel" class="queue-info" hidden>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="queueMsg">Position in queue: <strong id="queuePos">—</strong>. Your job will start automatically.</span>
+        </div>
+
+        <!-- Progress -->
+        <div id="progressPanel">
+          <div class="prog-numbers">
+            <div class="prog-pct" id="progPct">0%</div>
+            <div class="prog-count" id="progCount">0 / 0 lectures</div>
+          </div>
+          <div class="prog-bar-track">
+            <div class="prog-bar-fill" id="progBar"></div>
+          </div>
+        </div>
+
+        <div class="log-label">Terminal output</div>
+        <div class="log-terminal" id="logTerminal">
+          <div class="log-line info"><span class="log-ts">--:--:--</span><span class="log-text">Waiting for job to start…</span></div>
+        </div>
+
+        <!-- Result panels -->
+        <div id="resultOk" class="result-panel ok" hidden>
+          <div class="result-title">✓ All lectures completed</div>
+          <div class="result-sub">VTU thinks you watched all of them. Good enough.</div>
+          <div class="result-stats">
+            <div class="result-stat">
+              <div class="result-stat-num" id="resCompleted">0</div>
+              <div class="result-stat-lbl">Completed</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-num" id="resSkipped">0</div>
+              <div class="result-stat-lbl">Already done</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-num" id="resTotal">0</div>
+              <div class="result-stat-lbl">Total</div>
+            </div>
+          </div>
+          <div class="community-counters">
+            <span class="community-stat">Community total: <span id="comStudents">—</span> students freed, <span id="comLectures">—</span> lectures completed</span>
+          </div>
+        </div>
+
+        <div id="resultFail" class="result-panel fail" hidden>
+          <div class="result-title">✗ Something went wrong</div>
+          <div class="result-sub" id="failMsg">An unexpected error occurred.</div>
+        </div>
+
+        <div style="text-align:center;margin-top:1rem;">
+          <button class="btn-sec" id="runAnotherBtn" hidden>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Run another course
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ── GITHUB BANNER ── -->
+  <section style="padding: 3rem 0;">
+    <div class="gh-cta">
+      <div class="gh-cta-text">
+        <h3>This tool saved you ~<span id="savedHrs">55</span> hours.</h3>
+        <p>A GitHub ⭐ takes <em>3 seconds</em> and keeps this alive for the next student.</p>
+      </div>
+      <a href="https://github.com/r2k-venom/vtu-course-automation" target="_blank" rel="noopener noreferrer" class="btn-star github-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        Star on GitHub
+      </a>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ── SELF-HOST ── -->
+  <section>
+    <div class="sec-label">Self-host</div>
+    <div class="sec-title">Run it yourself</div>
+    <p class="sec-sub">Deploy on any Node.js server in under two minutes.</p>
+
+    <div class="install-grid">
+      <div class="install-panel">
+        <div class="install-panel-label">Option A — Web UI</div>
+        <h3>npm run serve</h3>
+        <p>Full web server with queue, SSE streaming and Redis persistence.</p>
+        <div class="code-block">
+          <code id="lcmd1">git clone https://github.com/r2k-venom/vtu-course-automation &amp;&amp; cd vtu-course-automation &amp;&amp; npm install</code>
+          <button class="copy-btn" onclick="copyCode('lcmd1',this)">copy</button>
+        </div>
+      </div>
+      <div class="install-panel">
+        <div class="install-panel-label">Option B — CLI only</div>
+        <h3>npm start</h3>
+        <p>Runs directly in your terminal. Set credentials in <code>.env</code>.</p>
+        <div class="code-block">
+          <code id="lcmd2">cp .env.example .env &amp;&amp; npm start</code>
+          <button class="copy-btn" onclick="copyCode('lcmd2',this)">copy</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ── FAQ ── -->
+  <section>
+    <div class="sec-label">FAQ</div>
+    <div class="sec-title">Before you ask</div>
+    <p class="sec-sub">The questions that came up enough to write down.</p>
+
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Is this safe? Will my account get banned?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a">
+          The tool uses the official VTU API — the same one your browser uses. It doesn't scrape, it doesn't spoof. Thousands of students have used it without incident. That said, use common sense: don't run it constantly and you should be fine.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Are my credentials stored anywhere?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a">
+          No. Your email and password are held in memory only for the duration of the job, then zeroed out. Nothing is written to disk or Redis. The source code is open — verify it yourself.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          How long does it take?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a">
+          Typically 5–15 minutes per course depending on lecture count and queue depth. The server paces requests to avoid triggering rate limits, so patience pays off.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          Can I close this tab?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a">
+          Yes. The job runs server-side. Copy the page URL (it has your job ID) and open it again to reconnect to a live job.
+        </div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q" onclick="toggleFaq(this)">
+          A lecture says "Max attempts reached" — what now?
+          <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-a">
+          Some lectures don't accept progress via the API. Usually it's special or gated content. These can safely be ignored — VTU's portal typically doesn't require 100% to mark a course complete.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- ── FOOTER ── -->
+  <footer>
+    <div>
+      Built by
+      <a href="https://github.com/r2k-venom" target="_blank" rel="noopener noreferrer">Chirag Shetty</a>
+      &nbsp;&middot;&nbsp;
+      Not affiliated with VTU
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/r2k-venom/vtu-course-automation" target="_blank" rel="noopener noreferrer" class="github-link">Source on GitHub</a>
+      <span class="footer-dot">·</span>
+      <span>MIT License</span>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  window.VTU_API_BASE = "";
+</script>
+
+<script>
+  "use strict";
+
+  const API_BASE = window.VTU_API_BASE || "";
+
+  let currentJobId = null;
+  let sseSource    = null;
+  let jobTotal     = 0;
+  let jobProcessed = 0;
+  let jobAlreadyDone = 0;
+  let githubUrl    = "https://github.com/r2k-venom/vtu-course-automation";
+  let isCompleted  = false;
+
+  /* ── Init ── */
+  document.addEventListener("DOMContentLoaded", () => {
+    loadStats();
+    loadNotification();
+    setupForm();
+    setupProgressControls();
+
+    const hashId = location.hash.slice(1);
+    if (hashId && /^[\da-f]{8}-[\da-f]{4}-4[\da-f]{3}-[89ab][\da-f]{3}-[\da-f]{12}$/i.test(hashId)) {
+      connectToJob(hashId);
+    }
+  });
+
+  /* ── Stats ── */
+  async function loadStats() {
+    try {
+      const data = await fetch(API_BASE + "/api/stats").then(r => r.json());
+      const students  = data.studentsHelped  || 0;
+      const lectures  = data.lecturesCompleted || 0;
+      animateCounter("studentsCounter", students);
+      animateCounter("lecturesCounter", lectures);
+      animateCounter("hoursCounter", Math.round(lectures * 0.5));
+      if (data.githubUrl) {
+        githubUrl = data.githubUrl;
+        document.querySelectorAll(".github-link").forEach(el => { el.href = githubUrl; });
+      }
+    } catch (_) {}
+  }
+
+  function animateCounter(id, target) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (target === 0) { el.textContent = "0"; return; }
+    let current = 0;
+    const steps = 60, stepVal = target / steps, interval = 1400 / steps;
+    const fmt = n => n >= 1000 ? (n/1000).toFixed(1)+"k" : String(n);
+    const iv = setInterval(() => {
+      current = Math.min(target, current + stepVal);
+      el.textContent = fmt(Math.round(current));
+      if (current >= target) clearInterval(iv);
+    }, interval);
+  }
+
+  /* ── Notification ── */
+  async function loadNotification() {
+    try {
+      const data = await fetch(API_BASE + "/api/notification").then(r => r.json());
+      const notifEl = document.getElementById("notification");
+      const msgEl   = document.getElementById("notifMsg");
+      const submitEl = document.getElementById("submitBtn");
+      if (data.message) {
+        notifEl.hidden = false;
+        msgEl.textContent = data.message;
+      }
+      if (data.disabled) {
+        submitEl.disabled = true;
+      }
+    } catch (_) {}
+  }
+
+  /* ── Form ── */
+  function setupForm() {
+    document.getElementById("submitBtn").addEventListener("click", async () => {
+      const email    = document.getElementById("emailInput").value.trim();
+      const password = document.getElementById("pwInput").value;
+      const slug     = document.getElementById("slugInput").value.trim();
+
+      if (!email || !password || !slug) {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = true;
+      btn.innerHTML = `
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="animation:spin 1s linear infinite">
+          <line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/>
+          <line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
+          <line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/>
+        </svg>
+        Launching…`;
+
+      try {
+        const res  = await fetch(API_BASE + "/api/submit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password, courseSlug: slug }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          btn.disabled = false;
+          btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Launch Autopilot`;
+          alert(data.error || "Submission failed.");
+          return;
+        }
+
+        location.hash = data.jobId;
+        connectToJob(data.jobId, data.position);
+        document.getElementById("formSection").style.display = "none";
+        document.getElementById("progressSection").style.display = "block";
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Launch Autopilot`;
+        alert("Network error. Check your connection.");
+      }
+    });
+  }
+
+  /* ── SSE ── */
+  function connectToJob(jobId, initialPosition) {
+    currentJobId = jobId;
+
+    document.getElementById("formSection").style.display = "none";
+    document.getElementById("progressSection").style.display = "block";
+
+    if (initialPosition && initialPosition > 1) {
+      showQueuePanel(initialPosition);
+    }
+
+    sseSource = new EventSource(API_BASE + "/api/status/" + jobId);
+
+    sseSource.addEventListener("snapshot", e => handleSnapshot(JSON.parse(e.data)));
+    sseSource.addEventListener("queue_pos", e => {
+      const { position } = JSON.parse(e.data);
+      if (position > 0) showQueuePanel(position);
+      else hideQueuePanel();
+    });
+    sseSource.addEventListener("status", e => {
+      const { status } = JSON.parse(e.data);
+      setStatusBadge(status);
+      if (status === "processing") hideQueuePanel();
+    });
+    sseSource.addEventListener("phase",        e => appendLog(JSON.parse(e.data).message, "phase"));
+    sseSource.addEventListener("log",          e => { const d = JSON.parse(e.data); appendLog(d.text, d.level === "error" ? "err" : d.level === "success" ? "ok" : "info"); });
+    sseSource.addEventListener("course_info",  e => { const d = JSON.parse(e.data); jobTotal = d.total; updateProgress(0, d.total); appendLog(`Course: "${d.title}" — ${d.total} lectures`, "phase"); });
+    sseSource.addEventListener("lecture_done", e => handleLectureDone(JSON.parse(e.data)));
+    sseSource.addEventListener("done",         e => handleDone(JSON.parse(e.data)));
+    sseSource.addEventListener("failed",       e => handleFailed(JSON.parse(e.data)));
+    sseSource.onerror = () => { if (isCompleted) sseSource.close(); };
+  }
+
+  function handleSnapshot(snap) {
+    setStatusBadge(snap.status);
+    jobTotal     = snap.total     || 0;
+    jobProcessed = snap.processed || 0;
+    updateProgress(snap.processed, snap.total, snap.progress);
+
+    if (snap.position > 0) showQueuePanel(snap.position);
+    else hideQueuePanel();
+
+    if (snap.logs) {
+      clearLog();
+      snap.logs.forEach(({ type, data }) => {
+        if (type === "phase")        appendLog(data.message, "phase");
+        else if (type === "log")     appendLog(data.text, data.level === "error" ? "err" : data.level === "success" ? "ok" : "info");
+        else if (type === "course_info") { jobTotal = data.total; appendLog(`Course: "${data.title}" — ${data.total} lectures`, "phase"); }
+        else if (type === "lecture_done") processLectureDone(data);
+      });
+    }
+
+    if (snap.status === "done" && snap.result) handleDone(snap.result);
+    else if (snap.status === "failed" && snap.result) handleFailed(snap.result);
+  }
+
+  function handleLectureDone(d) {
+    if (!d.retry) processLectureDone(d);
+  }
+
+  function processLectureDone(d) {
+    if (d.status === "skip" && d.reason === "Already completed") {
+      jobAlreadyDone++;
+      const effective = (d.completed || 0) + jobAlreadyDone;
+      updateProgress(effective, jobTotal);
+      appendLog(`[${d.idx}/${d.total}] ⊘ ${d.title} — Already completed`, "skip");
+    } else if (d.status === "done") {
+      const effective = (d.completed || 0) + jobAlreadyDone;
+      updateProgress(effective, jobTotal);
+      appendLog(`[${d.idx}/${d.total}] ✓ ${d.title}`, "ok");
+    } else if (d.status === "maxed") {
+      appendLog(`[${d.idx}/${d.total}] ✗ ${d.title} — ${d.reason}`, "err");
+    } else if (d.status === "skip") {
+      appendLog(`[${d.idx}/${d.total}] ⊘ ${d.title} — ${d.reason}`, "skip");
+    }
+  }
+
+  function handleDone(result) {
+    isCompleted = true;
+    setStatusBadge("done");
+    hideQueuePanel();
+    updateProgress(result.total || jobTotal, result.total || jobTotal, 100);
+    document.getElementById("resCompleted").textContent = result.completed || 0;
+    document.getElementById("resSkipped").textContent   = result.skipped   || 0;
+    document.getElementById("resTotal").textContent     = result.total     || 0;
+    if (result.stats) {
+      document.getElementById("comStudents").textContent = fmtNum(result.stats.studentsHelped);
+      document.getElementById("comLectures").textContent = fmtNum(result.stats.lecturesCompleted);
+    }
+    const hrs = Math.round((result.total || 0) * 0.5);
+    document.getElementById("savedHrs").textContent = hrs || 55;
+    document.getElementById("resultOk").hidden = false;
+    document.getElementById("runAnotherBtn").hidden = false;
+    document.getElementById("progSubtitle").textContent = "All done. VTU thinks you watched every lecture.";
+    if (sseSource) sseSource.close();
+  }
+
+  function handleFailed(data) {
+    isCompleted = true;
+    setStatusBadge("failed");
+    hideQueuePanel();
+    document.getElementById("failMsg").textContent = data.message || "An error occurred.";
+    document.getElementById("resultFail").hidden = false;
+    document.getElementById("runAnotherBtn").hidden = false;
+    if (sseSource) sseSource.close();
+  }
+
+  /* ── Progress helpers ── */
+  function updateProgress(processed, total, forcePct) {
+    const pct = forcePct !== undefined
+      ? forcePct
+      : total > 0 ? Math.round((processed / total) * 100) : 0;
+    document.getElementById("progPct").textContent = pct + "%";
+    document.getElementById("progCount").textContent = `${processed} / ${total} lectures`;
+    document.getElementById("progBar").style.width = pct + "%";
+  }
+
+  /* ── Status badge ── */
+  function setStatusBadge(status) {
+    const badge = document.getElementById("statusBadge");
+    const text  = document.getElementById("statusText");
+    badge.className = "status-badge " + status;
+    text.textContent = { queued: "Queued", processing: "Running", done: "Complete", failed: "Failed" }[status] || status;
+    const titles = { processing: "Running…", done: "Finished", failed: "Failed", queued: "Running…" };
+    document.querySelector("#progressSection .sec-title").textContent = titles[status] || "Running…";
+  }
+
+  /* ── Queue panel ── */
+  function showQueuePanel(position) {
+    document.getElementById("queuePanel").hidden = false;
+    document.getElementById("queuePos").textContent = position;
+  }
+  function hideQueuePanel() {
+    document.getElementById("queuePanel").hidden = true;
+  }
+
+  /* ── Log terminal ── */
+  function clearLog() {
+    document.getElementById("logTerminal").innerHTML = "";
+  }
+
+  function appendLog(text, type = "info") {
+    const terminal = document.getElementById("logTerminal");
+    const now = new Date();
+    const ts = String(now.getHours()).padStart(2,"0") + ":" +
+               String(now.getMinutes()).padStart(2,"0") + ":" +
+               String(now.getSeconds()).padStart(2,"0");
+    const line = document.createElement("div");
+    line.className = "log-line " + type;
+    line.innerHTML = `<span class="log-ts">${ts}</span><span class="log-text">${escHtml(text)}</span>`;
+    terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  function escHtml(s) {
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  }
+
+  function fmtNum(n) {
+    if (!n) return "0";
+    return n >= 1000 ? (n/1000).toFixed(1)+"k" : String(n);
+  }
+
+  /* ── Controls ── */
+  function setupProgressControls() {
+    document.getElementById("runAnotherBtn").addEventListener("click", () => {
+      location.hash = "";
+      if (sseSource) sseSource.close();
+      isCompleted  = false;
+      currentJobId = null;
+      jobTotal = jobProcessed = jobAlreadyDone = 0;
+
+      document.getElementById("progressSection").style.display = "none";
+      document.getElementById("formSection").style.display = "block";
+      document.getElementById("resultOk").hidden = true;
+      document.getElementById("resultFail").hidden = true;
+      document.getElementById("runAnotherBtn").hidden = true;
+      clearLog();
+      updateProgress(0, 0);
+
+      const btn = document.getElementById("submitBtn");
+      btn.disabled = false;
+      btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Launch Autopilot`;
+    });
+
+    document.getElementById("shareBtn").addEventListener("click", () => {
+      if (!currentJobId) return;
+      const url = location.origin + location.pathname + "#" + currentJobId;
+      navigator.clipboard.writeText(url).then(() => {
+        const btn = document.getElementById("shareBtn");
+        btn.textContent = "Copied!";
+        setTimeout(() => {
+          btn.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share link`;
+        }, 2000);
+      });
+    });
+  }
+
+  /* ── Copy code ── */
+  function copyCode(id, btn) {
+    const text = document.getElementById(id).textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = "✓";
+      btn.classList.add("copied");
+      setTimeout(() => { btn.textContent = "copy"; btn.classList.remove("copied"); }, 2000);
+    });
+  }
+
+  /* ── FAQ ── */
+  function toggleFaq(el) {
+    const item = el.parentElement;
+    item.classList.toggle("open");
+  }
+
+  /* ── Spin keyframe ── */
+  const style = document.createElement("style");
+  style.textContent = "@keyframes spin { to { transform: rotate(360deg); } }";
+  document.head.appendChild(style);
+</script>
+</body>
+</html>
